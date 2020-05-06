@@ -21,7 +21,8 @@ const userName = document.querySelector('.user-name');
 const buttonOut = document.querySelector('.button-out');
 
 function toggleModalAuth() {
-  modalAuth.classList.toggle("is-open"); // навешивает или удаляет класс 
+  modalAuth.classList.toggle("is-open"); // навешивает или удаляет класс
+  loginInput.style.borderColor = ''; // если пользователь не ввёл логин то крашу дальше в красный, а сдесь перекрашываю обратно
 }
 
 function authorized() {
@@ -57,7 +58,6 @@ function notAuthorized() {
     login = loginInput.value;
 
     if ( login !== '' ){
-      loginInput.style.borderColor = '';
       localStorage.setItem('gloDelivery', login);
 
       toggleModalAuth();
@@ -68,7 +68,6 @@ function notAuthorized() {
       checkAuth();
     } else {
       loginInput.style.borderColor = 'red';
-      logIn();
     }
   }
 
