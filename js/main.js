@@ -1,13 +1,9 @@
+'use strict';
+
+
 const cartButton = document.querySelector("#cart-button");
 const modal = document.querySelector(".modal");
 const close = document.querySelector(".close");
-
-cartButton.addEventListener("click", toggleModal);
-close.addEventListener("click", toggleModal);
-
-function toggleModal() {
-  modal.classList.toggle("is-open");
-}
 
 // day 1
 
@@ -24,7 +20,13 @@ const cardsRestaurants = document.querySelector('.cards-restaurants');
 const containerPromo = document.querySelector('.container-promo')
 const restaurants = document.querySelector('.restaurants')
 const menu = document.querySelector('.menu')
+const logo = document.querySelector('.logo')
+const cardsMenu = document.querySelector('.cards-menu')
 
+
+function toggleModal() {
+  modal.classList.toggle("is-open");
+}
 
 function toggleModalAuth() {
   modalAuth.classList.toggle("is-open"); // навешивает или удаляет класс
@@ -90,7 +92,6 @@ function checkAuth() {
   }
 }
 
-checkAuth();
 
 // day 2
 
@@ -119,9 +120,36 @@ function createCardRestaurant() {
 
 }
 
-createCardRestaurant();
+function createCardGood() {
 
-function openGoods(event) {
+  const card = document.createElement('div');
+  card.className = 'card';
+
+  card.insertAdjacentHTML('beforeend', `
+  <img src="img/pizza-plus/pizza-plus.jpg" alt="image" class="card-image"/>
+  <div class="card-text">
+    <div class="card-heading">
+      <h3 class="card-title card-title-reg">Пицца Плюс</h3>
+    </div>
+    <div class="card-info">
+      <div class="ingredients">Соус томатный, сыр «Моцарелла», сыр «Чеддер», томаты, пепперони,
+        телятина, грибы, бекон, болгарский перец.
+      </div>
+    </div>
+    <div class="card-buttons">
+      <button class="button button-primary button-add-cart">
+        <span class="button-card-text">В корзину</span>
+        <span class="button-cart-svg"></span>
+      </button>
+      <strong class="card-price-bold">805 ₽</strong>
+    </div>
+  </div>
+  `);
+
+  cardsMenu.insertAdjacentElement('beforeend', card)
+}
+
+function openGoods(event) { 
 
   const target = event.target;
   const restaurant = target.closest('.card-restaurant');
@@ -129,11 +157,29 @@ function openGoods(event) {
   console.log('restaurant: ', restaurant);
 
   if (restaurant) {
+    cardsMenu.textContent = '';
     containerPromo.classList.add('hide');
     restaurants.classList.add('hide');
     menu.classList.remove('hide');
-  }
 
+    createCardGood();
+    createCardGood();
+    createCardGood();
+  }
 }
 
+cartButton.addEventListener("click", toggleModal);
+
+close.addEventListener("click", toggleModal);
+
 cardsRestaurants.addEventListener('click', openGoods);
+
+logo.addEventListener('click', function() {
+  containerPromo.classList.remove('hide');
+    restaurants.classList.remove('hide');
+    menu.classList.add('hide');
+})
+
+checkAuth();
+
+createCardRestaurant();
