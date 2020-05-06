@@ -150,21 +150,25 @@ function createCardGood() {
 }
 
 function openGoods(event) { 
+  if (login) {
+    const target = event.target;
+    const restaurant = target.closest('.card-restaurant');
 
-  const target = event.target;
-  const restaurant = target.closest('.card-restaurant');
+    console.log('restaurant: ', restaurant);
 
-  console.log('restaurant: ', restaurant);
+    if (restaurant) {
+      cardsMenu.textContent = '';
+      containerPromo.classList.add('hide');
+      restaurants.classList.add('hide');
+      menu.classList.remove('hide');
 
-  if (restaurant) {
-    cardsMenu.textContent = '';
-    containerPromo.classList.add('hide');
-    restaurants.classList.add('hide');
-    menu.classList.remove('hide');
-
-    createCardGood();
-    createCardGood();
-    createCardGood();
+      createCardGood();
+      createCardGood();
+      createCardGood();
+    }
+  } else {
+    console.log("sosi");
+    toggleModalAuth();
   }
 }
 
