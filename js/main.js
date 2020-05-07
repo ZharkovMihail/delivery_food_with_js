@@ -28,6 +28,20 @@ const valid = function(str) {
   return nameReg.test(str)
 }
 
+const getData = async function(url) {
+
+  const response = await fetch(url);
+
+  if (!response.ok) {
+    throw new Error(`Ошибка по адресу ${url}, код ошибки ${response.status}`)
+  }
+
+  return await response.json();
+
+};
+
+console.log( getData('db/partners.json') );
+
 function toggleModal() {
   modal.classList.toggle("is-open");
 }
