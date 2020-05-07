@@ -23,6 +23,10 @@ const menu = document.querySelector('.menu')
 const logo = document.querySelector('.logo')
 const cardsMenu = document.querySelector('.cards-menu')
 
+const valid = function(str) {
+  const nameReg = /^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/;
+  return nameReg.test(str)
+}
 
 function toggleModal() {
   modal.classList.toggle("is-open");
@@ -65,7 +69,7 @@ function notAuthorized() {
     event.preventDefault();
     login = loginInput.value.trim();
 
-    if ( login !== '' ){
+    if ( valid(login) ){
       localStorage.setItem('gloDelivery', login);
 
       toggleModalAuth();
@@ -76,6 +80,7 @@ function notAuthorized() {
       checkAuth();
     } else {
       loginInput.style.borderColor = 'red';
+      loginInput.value = '';
     }
   }
 
@@ -150,25 +155,24 @@ function createCardGood() {
 }
 
 function openGoods(event) { 
-  if (login) {
     const target = event.target;
     const restaurant = target.closest('.card-restaurant');
 
     console.log('restaurant: ', restaurant);
 
     if (restaurant) {
-      cardsMenu.textContent = '';
-      containerPromo.classList.add('hide');
-      restaurants.classList.add('hide');
-      menu.classList.remove('hide');
+      if (login) {
+        cardsMenu.textContent = '';
+        containerPromo.classList.add('hide');
+        restaurants.classList.add('hide');
+        menu.classList.remove('hide');
 
-      createCardGood();
-      createCardGood();
-      createCardGood();
-    }
-  } else {
-    console.log("sosi");
-    toggleModalAuth();
+        createCardGood();
+        createCardGood();
+        createCardGood();
+      } else {
+        toggleModalAuth();
+      }
   }
 }
 
@@ -187,3 +191,8 @@ logo.addEventListener('click', function() {
 checkAuth();
 
 createCardRestaurant();
+
+new Swiper('.swiper-container', {
+  loop: true,
+  autoplay: true
+})
