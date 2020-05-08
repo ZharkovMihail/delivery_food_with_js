@@ -17,17 +17,21 @@ const userName = document.querySelector('.user-name');
 const buttonOut = document.querySelector('.button-out');
 
 const cardsRestaurants = document.querySelector('.cards-restaurants');
-const containerPromo = document.querySelector('.container-promo')
-const restaurants = document.querySelector('.restaurants')
-const menu = document.querySelector('.menu')
-const logo = document.querySelector('.logo')
-const cardsMenu = document.querySelector('.cards-menu')
+const containerPromo = document.querySelector('.container-promo');
+const restaurants = document.querySelector('.restaurants');
+const menu = document.querySelector('.menu');
+const logo = document.querySelector('.logo');
+const cardsMenu = document.querySelector('.cards-menu');
 
-const restaurantTitle = document.querySelector('.restaurant-title')
-const rating = document.querySelector('.rating')
-const minPrice = document.querySelector('.price')
-const category = document.querySelector('.category')
-const inputSearch = document.querySelector('.input-search')
+const restaurantTitle = document.querySelector('.restaurant-title');
+const rating = document.querySelector('.rating');
+const minPrice = document.querySelector('.price');
+const category = document.querySelector('.category');
+const inputSearch = document.querySelector('.input-search');
+
+const modalBody = document.querySelector('.modal-body');
+const modalPrice = document.querySelector('.modal-pricetag');
+const buttonClearCart = document.querySelector('.clear-cart');
 
 const valid = function(str) {
   const nameReg = /^[a-zA-Z][a-zA-Z0-9-_\.]{1,20}$/;
@@ -46,6 +50,7 @@ const getData = async function(url) {
 
 };
 
+const cart = [];
 
 function toggleModal() {
   modal.classList.toggle("is-open");
@@ -67,6 +72,7 @@ function authorized() {
     buttonAuth.style.display = '';
     userName.style.display = '';
     buttonOut.style.display = '';
+    cartButton.style.display = '';
     
     buttonOut.removeEventListener('click', logOut);
 
@@ -76,7 +82,8 @@ function authorized() {
   userName.textContent = login;
   buttonAuth.style.display = 'none'; // скрываю кнопку
   userName.style.display = "inline";
-  buttonOut.style.display = 'block';
+  buttonOut.style.display = 'flex';
+  cartButton.style.display = 'flex';
 
   buttonOut.addEventListener('click', logOut);
 }
@@ -179,11 +186,11 @@ function createCardGood({
       </div>
     </div>
     <div class="card-buttons">
-      <button class="button button-primary button-add-cart">
+      <button class="button button-primary button-add-cart" id="${id}">
         <span class="button-card-text">В корзину</span>
         <span class="button-cart-svg"></span>
       </button>
-      <strong class="card-price-bold">${price} ₽</strong>
+      <strong class="card-price card-price-bold">${price} ₽</strong>
     </div>
   </div>
   `);
@@ -222,12 +229,97 @@ function openGoods(event) {
   }
 }
 
+function addToCart(event) { // добавление в карзину по нажатию на кнопку
+  const target = event.target;
+  const buttonAddToCart = target.closest('.button-add-cart')
+  
+  if (buttonAddToCart) {
+    const card = target.closest('.card')
+    const title = card.querySelector('.card-title-reg').textContent;
+    const price = card.querySelector('.card-price').textContent;
+    const id = buttonAddToCart.id; 
+
+    const food = cart.find(function(item){
+      return item.id === id;
+    });
+
+    if (food) {
+      food.count += 1;
+    } else {
+      cart.push({
+        id,
+        title,
+        price,
+        count: 1
+      });
+    }
+  }
+}
+
+function renderCart() { 
+  modalBody.textContent = '';
+  cart.forEach(function({ id, title, price, count }) {
+    const itemCart = `
+      <div class="food-row">
+        <span class="food-name">${title}</span>
+        <strong class="food-price">${price}</strong>
+        <div class="food-counter">
+          <button class="counter-button counter-minus" data-id="${id}">-</button>
+          <span class="counter">${count}</span>
+          <button class="counter-button counter-plus" data-id="${id}">+</button>
+        </div>
+      </div>
+    `;
+
+    modalBody.insertAdjacentHTML('afterbegin', itemCart)
+  })
+
+  const totalPrice = cart.reduce(function(result, item) { //ститаю сумму
+    return result + parseFloat(item.price) * item.count
+  }, 0);
+
+  modalPrice.textContent = totalPrice + ' ₽';
+}
+
+function changeCount(event) {
+  const target = event.target;
+
+  if (target.classList.contains('counter-button')) {
+    const food = cart.find(function(item){
+      return item.id === target.dataset.id;
+    })
+    if (target.classList.contains('counter-minus')) {
+      food.count--;
+      if (food.count === 0) {
+        cart.splice(cart.indexOf(food), 1);
+      } 
+    }
+    if (target.classList.contains('counter-plus')) {
+      food.count++;
+    }
+    renderCart();
+  }
+
+}
+
 function init() {
   getData('db/partners.json').then(function(data) {
     data.forEach(createCardRestaurant);
   });
   
-  cartButton.addEventListener("click", toggleModal);
+  cartButton.addEventListener("click", function() {
+    renderCart();
+    toggleModal();
+  });
+
+  modalBody.addEventListener('click', changeCount)
+
+  buttonClearCart.addEventListener('click', function(){
+    cart.length = 0;
+    renderCart();
+  })
+
+  cardsMenu.addEventListener('click', addToCart)
   
   close.addEventListener("click", toggleModal);
   
@@ -297,7 +389,10 @@ function init() {
   
   new Swiper('.swiper-container', {
     loop: true,
-    autoplay: true
+    autoplay: {
+      delay: 3000,
+      disableOnInteraction: false
+    }
   });
 }
 
